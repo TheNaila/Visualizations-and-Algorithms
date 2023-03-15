@@ -1,0 +1,9 @@
+svg {
+    position: relative;
+}
+
+.flash-circle{
+    fill : white;
+    stroke: black;
+    stroke-width: 3;
+}
