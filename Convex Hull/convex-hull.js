@@ -33,8 +33,6 @@ circle.setAttributeNS(null, "cx", x)
 circle.setAttributeNS(null, "r",5)
 SVG.appendChild(circle)
 pointSet.addNewPoint(x,y)
-
-
 }
 
 let stack = []
@@ -62,11 +60,6 @@ stack.push(circles[secondElement.id])
 
 let stepbtn = document.getElementById("step-btn")
 stepbtn.addEventListener("click", continueConvexHull)
-
-let pointSetInd = 2
-let pointer1 = 1
-let pointer2 = 2
-let firstStep = true
 
 // function Test(){
 //     let circle = document.createElementNS(SVG_NS, "circle")
@@ -104,47 +97,45 @@ function rightTurn(pt, pt1, pt2){
     return true
 
 }
-let count = 1
+
+let firstStep = true
+let pointerID = 2
 function continueConvexHull(){
     if(firstStep)
     {
     drawLineSegment(stack[0], stack[1])
     firstStep = false
-    console.log("segment", count)
     console.log("from", 0, "to", 1)
-    count++
-   
     }
     else{
     
+    let nextID =  pointSet.points[pointerID].id
+    console.log("pointerID", pointerID)
+//    //indexing pointSet to find the next element, and then using the ID to get the insertion order so that I can index into the circles array 
+    let cur = circles[nextID]
+    let parent = stack.pop() // elem 1
+    let grandparent = stack.pop() //elem 0 
     
-    let nextID =  pointSet.points[pointer2].id
-   //indexing pointSet to find the next element, and then using the ID to get the insertion order so that I can index into the circles array 
-    stack.push(circles[nextID])
-    
-    drawLineSegment(stack[pointer1],stack[pointer2])
+    drawLineSegment(parent, cur)
 
-    console.log("segment", count)
-    console.log("from", pointer1, "to", pointer2)
-    count++
-    
-    if(!rightTurn(stack[pointer2], stack[pointer2 - 2], stack[pointer1])){
-        console.log("left turn")
-        stack.pop()
-        setTimeout(() => {
-            let badLine = lineStack.pop()
-            SVG.removeChild(badLine);
-          }, 1000);
-    
-        
-         }
-     
-    pointer1++
-    pointer2++
+    if(!rightTurn(cur, grandparent, parent)){
+        stack.push(grandparent) //middle? 
+        stack.push(cur) //top
+        let line1 = lineStack.pop()
+        SVG.removeChild(line1)
+        let line2 = lineStack.pop()
+        SVG.removeChild(line2)
+        drawLineSegment(grandparent, cur)
 
-  
+
+       
     }
-
+    else{
+        stack.push(parent)
+        stack.push(cur)
+    }
+    pointerID++
+    }
 
 }
 
