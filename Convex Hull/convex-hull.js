@@ -2,51 +2,47 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const SVG_WIDTH = 600;
 const SVG_HEIGHT = 400;
 
-
 const SVG = document.getElementById("convex-hull-box");
 SVG.setAttributeNS(SVG_NS,"width", SVG_WIDTH)
 SVG.setAttributeNS(null, "height", SVG_HEIGHT)
-SVG.addEventListener("click", createPoint)
 let pointSet = new PointSet()
-//!
-// Test()
+SVG.addEventListener("click", createPoint)
 
-// An object that represents a 2-d point, consisting of an
-// x-coordinate and a y-coordinate. The `compareTo` function
-// implements a comparison for sorting with respect to x-coordinates,
-// breaking ties by y-coordinate.
 
-let circles = []
+let circles = [] 
+//need an array of the circle refs themselves because when we add the points to pointset all we are doing is adding the x and y coordinates and creating a new object
+//We want to retain access to the circle object
+
 let lineStack = []
+//stack of all our lines
+
+let stack = []
+//Convex Hull points stack 
 
 function createPoint(e){
-console.log("Click position", e.clientY)
 
 rect = SVG.getBoundingClientRect(); 
-console.log("Rect top", rect.top)
+//ensures that we are getting the circle element coordinates relative to our viewport and not the page 
 let x = e.clientX - rect.left
 let y = e.clientY - rect.top
 let circle = document.createElementNS(SVG_NS,"circle"); 
 circle.classList.add("circle"); 
-circle.setAttributeNS(null, "cy", y) //relative to the parent element aka the whole page 
+circle.setAttributeNS(null, "cy", y)
 circle.setAttributeNS(null, "cx", x)
 circle.setAttributeNS(null, "r",5)
+//adding the circle to the page and the points []
 SVG.appendChild(circle)
 pointSet.addNewPoint(x,y)
 }
-
-let stack = []
 
 let startbtn = document.getElementById("start-btn")
 startbtn.addEventListener("click", startConvexHull)
 
 function startConvexHull(){
-//need an array of the circle refs themselves because when we add the points to pointset all we are doing is adding the x and y coordinates and creating a new object
-//We want to retain access to the circle object
+
 circles = document.getElementsByTagNameNS(SVG_NS,"circle")
 SVG.removeEventListener("click", createPoint)
 pointSet.sort()
-//! 
 console.log(pointSet.getXCoords())
 
 let leftMost = pointSet.points[0]
@@ -61,37 +57,21 @@ stack.push(circles[secondElement.id])
 let stepbtn = document.getElementById("step-btn")
 stepbtn.addEventListener("click", continueConvexHull)
 
-// function Test(){
-//     let circle = document.createElementNS(SVG_NS, "circle")
-//     let circle1 = document.createElementNS(SVG_NS, "circle")
-//     let circle2 = document.createElementNS(SVG_NS, "circle")
-
-//     circle.setAttributeNS(null, "cx", 2);
-//     circle.setAttributeNS(null, "cy", 13);
-
-//     circle1.setAttributeNS(null, "cx", 1);
-//     circle1.setAttributeNS(null, "cy", 11);
-    
-//     circle2.setAttributeNS(null, "cx", 3);
-//     circle2.setAttributeNS(null, "cy", 11);
-
-//     console.log(rightTurn(circle, circle1, circle2))
-// }
 
 function rightTurn(pt, pt1, pt2){
-   // pt = (x, y)
-   // pt1 = (x1, y1)
-   //pt2 = (x2, y2)
+  
    let x = pt.getAttributeNS(null, "cx")
    let y = pt.getAttributeNS(null, "cy")
    let x1 = pt1.getAttributeNS(null, "cx")
    let y1 = pt1.getAttributeNS(null, "cy")
    let x2 = pt2.getAttributeNS(null, "cx")
    let y2 = pt2.getAttributeNS(null, "cy")
-    let value = (( x - x1 ) * (y2 - y1)) - ((y - y1) * (x2 - x1))
+   let value = (( x - x1 ) * (y2 - y1)) - ((y - y1) * (x2 - x1))
+
     if(value > 0){
         console.log(false)
-        return false ///postive / on the left side
+        console.log(value)
+        return false ///postive --> on the left side
     }
     console.log(true)
     return true
@@ -100,39 +80,44 @@ function rightTurn(pt, pt1, pt2){
 
 let firstStep = true
 let pointerID = 2
+
 function continueConvexHull(){
+
     if(firstStep)
     {
     drawLineSegment(stack[0], stack[1])
     firstStep = false
-    console.log("from", 0, "to", 1)
+    console.log(0, 1)
     }
     else{
     
     let nextID =  pointSet.points[pointerID].id
-    console.log("pointerID", pointerID)
-//    //indexing pointSet to find the next element, and then using the ID to get the insertion order so that I can index into the circles array 
     let cur = circles[nextID]
-    let parent = stack.pop() // elem 1
-    let grandparent = stack.pop() //elem 0 
+
+    let parent = stack.pop() 
+    let grandparent = stack.pop()
     
-    drawLineSegment(parent, cur)
+    console.log(parent,cur)
+    console.log("Parent:", parent.getAttributeNS(null, "cx"))
+    console.log("Cur:", cur.getAttributeNS(null, "cx"))
+    
 
     if(!rightTurn(cur, grandparent, parent)){
-        stack.push(grandparent) //middle? 
-        stack.push(cur) //top
-        let line1 = lineStack.pop()
-        SVG.removeChild(line1)
+        stack.push(grandparent) 
+        stack.push(cur)
+        //let line1 = lineStack.pop()
+       // SVG.removeChild(line1)
         let line2 = lineStack.pop()
         SVG.removeChild(line2)
+        //make bad line varying shades of red
         drawLineSegment(grandparent, cur)
-
-
        
     }
     else{
+
         stack.push(parent)
         stack.push(cur)
+        drawLineSegment(parent, cur)
     }
     pointerID++
     }
@@ -149,7 +134,6 @@ line.setAttributeNS(null, "stroke-width", 2)
 line.setAttributeNS(null, "stroke", "black")
 SVG.appendChild(line)
 lineStack.push(line)
-console.log("Drew")
 
 }
 
