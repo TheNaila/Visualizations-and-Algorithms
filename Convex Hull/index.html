@@ -2,21 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Convex Hull</title>
+    <title>Graham's Scan Interactive</title>
     <link rel="stylesheet" href="style.css" type="text/css"/>
+    <!-- <script src="convex-hull.js" defer></script> -->
     <script src="convex-hull.js" defer></script>
+    <!-- <script src="ch-tester.js" defer></script> -->
+
     <!-- uncomment this line to test your program: -->
     <!-- <script src="ch-tester.js" defer></script> -->
   </head>
   <body>
     <div id="root">
-      <h1>Graham’s Convex Hull</h1>
-      <p>Make a description here</p>
+      <h1>Interactive Graham's Scan Algorithm</h1>
+      
+      <p>Welcome to our interactive Graham's Scan Algorithm page! To begin, click anywhere in the box below to add points to the plane. click a point again to remove it. After adding the points you want, click the "Start" button to start the simulation of Graham's Scan algorithm (you won't be able to add new points after you start). After clicking start, to see an illustration of each step through the execution of Graham's Scan algorithm, click the "Step" button. To watch an animated run-through of all the steps of the algorithm instead, click "Animate".</p>
+      
       <svg id="convex-hull-box" xmlns="http://www.w3.org/2000/svg" width="600" height="400">
       </svg>
+      
+      <button id="start-btn" type="button">Start</button>
+      <button id="step-btn" type="button">Step</button>
+      <button id="animate-btn" type="button">Animate</button>
     </div>
-    <button id = "start-btn" type = "button">Start</button>
-    <button id = "step-btn" type = "button">Step</button>
-    <button id = "animate-btn" type = "button">Animate</button>
   </body>
 </html>

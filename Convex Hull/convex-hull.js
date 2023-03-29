@@ -6,7 +6,7 @@ const SVG = document.getElementById("convex-hull-box");
 SVG.setAttributeNS(SVG_NS,"width", SVG_WIDTH)
 SVG.setAttributeNS(null, "height", SVG_HEIGHT)
 let pointSet = new PointSet()
-SVG.addEventListener("click", createPoint)
+
 
 
 let circles = [] 
@@ -35,28 +35,6 @@ SVG.appendChild(circle)
 pointSet.addNewPoint(x,y)
 }
 
-let startbtn = document.getElementById("start-btn")
-startbtn.addEventListener("click", startConvexHull)
-
-function startConvexHull(){
-
-circles = document.getElementsByTagNameNS(SVG_NS,"circle")
-SVG.removeEventListener("click", createPoint)
-pointSet.sort()
-console.log(pointSet.getXCoords())
-
-let leftMost = pointSet.points[0]
-let secondElement = pointSet.points[1]
-//we can index by the id of the points because the ids are the insert order and its the same order of the elements in the array of circle elements
-let circle = circles[leftMost.id]
-circle.setAttributeNS(null,"fill", "red")
-stack.push(circle)
-stack.push(circles[secondElement.id])
-}
-
-let stepbtn = document.getElementById("step-btn")
-stepbtn.addEventListener("click", continueConvexHull)
-
 
 function rightTurn(pt, pt1, pt2){
   
@@ -70,10 +48,11 @@ function rightTurn(pt, pt1, pt2){
 
     if(value > 0){
         console.log(false)
-        console.log(value)
+        console.log(value, "this is the value")
         return false ///postive --> on the left side
     }
     console.log(true)
+    console.log(value, "this is the value")
     return true
 
 }
@@ -81,48 +60,6 @@ function rightTurn(pt, pt1, pt2){
 let firstStep = true
 let pointerID = 2
 
-function continueConvexHull(){
-
-    if(firstStep)
-    {
-    drawLineSegment(stack[0], stack[1])
-    firstStep = false
-    console.log(0, 1)
-    }
-    else{
-    
-    let nextID =  pointSet.points[pointerID].id
-    let cur = circles[nextID]
-
-    let parent = stack.pop() 
-    let grandparent = stack.pop()
-    
-    console.log(parent,cur)
-    console.log("Parent:", parent.getAttributeNS(null, "cx"))
-    console.log("Cur:", cur.getAttributeNS(null, "cx"))
-    
-
-    if(!rightTurn(cur, grandparent, parent)){
-        stack.push(grandparent) 
-        stack.push(cur)
-        //let line1 = lineStack.pop()
-       // SVG.removeChild(line1)
-        let line2 = lineStack.pop()
-        SVG.removeChild(line2)
-        //make bad line varying shades of red
-        drawLineSegment(grandparent, cur)
-       
-    }
-    else{
-
-        stack.push(parent)
-        stack.push(cur)
-        drawLineSegment(parent, cur)
-    }
-    pointerID++
-    }
-
-}
 
 function drawLineSegment(pt1, pt2){
 let line = document.createElementNS(SVG_NS, "line")
@@ -244,11 +181,20 @@ function PointSet () {
     }
 }
 
+let cv = new ConvexHull(pointSet, new ConvexHullViewer(SVG, pointSet))
+
+let startbtn = document.getElementById("start-btn")
+startbtn.addEventListener("click", cv.start)
+
+let stepbtn = document.getElementById("step-btn")
+stepbtn.addEventListener("click", cv.step)
 
 function ConvexHullViewer (svg, ps) {
     this.svg = svg;  // a n svg object where the visualization is drawn
     this.ps = ps;    // a point set of the points to be visualized
 
+    this.svg.addEventListener("click", createPoint)
+    
     // COMPLETE THIS OBJECT
 }
 
@@ -262,14 +208,68 @@ function ConvexHull (ps, viewer) {
     // start a visualization of the Graham scan algorithm performed on ps
     this.start = function () {
 	
-	// COMPLETE THIS METHOD
-	
+    circles = document.getElementsByTagNameNS(SVG_NS,"circle")
+    SVG.removeEventListener("click", createPoint)
+    pointSet.sort()
+    console.log(pointSet.getXCoords())
+    
+    let leftMost = pointSet.points[0]
+    let secondElement = pointSet.points[1]
+    //we can index by the id of the points because the ids are the insert order and its the same order of the elements in the array of circle elements
+    let circle = circles[leftMost.id]
+    circle.setAttributeNS(null,"fill", "red")
+    stack.push(circle)
+    stack.push(circles[secondElement.id])
+   
+
     }
 
     // perform a single step of the Graham scan algorithm performed on ps
     this.step = function () {
 	
-	// COMPLETE THIS METHOD
+        if(firstStep)
+        {
+        drawLineSegment(stack[0], stack[1])
+        firstStep = false
+        }
+        else{
+        
+        let nextID =  pointSet.points[pointerID].id
+        let cur = circles[nextID]
+    
+        let parent = stack.pop() 
+        let grandparent = stack.pop()
+        
+        console.log("Current:",cur)
+        console.log("Parent:", parent)
+        console.log("Grandparent", grandparent)
+        
+        
+        
+        if(rightTurn(cur, grandparent, parent)){
+                stack.push(parent)
+                stack.push(cur)
+                drawLineSegment(parent, cur)
+        }else{
+            let backCount = 3
+            
+        if(!rightTurn(cur, grandparent, parent)){
+            stack.push(grandparent)
+            stack.push(cur)
+        //     let line1 = lineStack.pop()
+        //    SVG.removeChild(line1)
+            let line2 = lineStack.pop()
+            SVG.removeChild(line2)
+            //make bad line varying shades of red
+            drawLineSegment(grandparent, cur)
+           
+        }
+        
+    }
+        
+        pointerID++
+        }
+    
 	
     }
 
@@ -281,8 +281,9 @@ function ConvexHull (ps, viewer) {
     // in clockwise order, starting from the left-most point, breaking
     // ties by minimum y-value.
     this.getConvexHull = function () {
-
-	// COMPLETE THIS METHOD
+        //!fix
+	 let convexStack = new PointSet()
+     convexStack.points = stack
 	
     }
 }
