@@ -35,54 +35,26 @@ SVG.appendChild(circle)
 pointSet.addNewPoint(x,y)
 }
 
-// function testPoints(x,y){
-//     let rect = SVG.getBoundingClientRect(); 
-//     let c1 = document.createElementNS(SVG_NS, "circle")
-//     c1.classList.add("circle"); 
-//     c1.setAttributeNS(null, "cx", x)
-//     c1.setAttributeNS(null, "cy", y)
-//     c1.setAttributeNS(null, "r",5)
-//     SVG.appendChild(c1)
-//     pointSet.addNewPoint(x,y)
-    
-// }
-// testPoints(62, 62.125)
-// testPoints(64, 213.125)
-// testPoints(249, 81.125)
-// testPoints(23,140.125)
-// testPoints(140, 158.125)
-// testPoints(188, 75.125)
-// testPoints(259, 211.125)
-// testPoints(72, 130.125)
-// testPoints(317, 60.125)
-// testPoints(178, 231.125)
-// testPoints(216,118.125)
-// testPoints(396, 109.125)
-// testPoints(309, 151.125)
 
+function rightTurn(pt, pt1, pt2){
+  
+   let x = pt.getAttributeNS(null, "cx")
+   let y = pt.getAttributeNS(null, "cy")
+   let x1 = pt1.getAttributeNS(null, "cx")
+   let y1 = pt1.getAttributeNS(null, "cy")
+   let x2 = pt2.getAttributeNS(null, "cx")
+   let y2 = pt2.getAttributeNS(null, "cy")
+   let value = (( x - x1 ) * (y2 - y1)) - ((y - y1) * (x2 - x1))
 
-
-function rightTurn(current, parent, grandparent){
-    let bx = parent.getAttributeNS(null, "cx")
-    let by = parent.getAttributeNS(null, "cy")
-    let ax = grandparent.getAttributeNS(null, "cx")
-    let ay = grandparent.getAttributeNS(null, "cy")
-    let cx = current.getAttributeNS(null, "cx")
-    let cy = current.getAttributeNS(null, "cy")
-    let vector_u_x = (bx - ax)
-    let vector_u_y = (by - ay)
-    let vector_v_x = (cx - bx)
-    let vector_v_y = (cy - by)
-    let vperp_x = (- vector_v_y)
-    let vperp_y = (vector_v_x)
-    let dot_product = (vperp_x * vector_u_x) + (vperp_y * vector_u_y)
-    
-    if(dot_product < 0){
-        console.log(true)
-        return true
+    if(value > 0){
+        console.log(false)
+        console.log(value, "this is the value")
+        return false ///postive --> on the left side
     }
-    console.log(false)
-    return false
+    console.log(true)
+    console.log(value, "this is the value")
+    return true
+
 }
 
 let firstStep = true
@@ -221,7 +193,6 @@ function ConvexHullViewer (svg, ps) {
     this.svg = svg;  // a n svg object where the visualization is drawn
     this.ps = ps;    // a point set of the points to be visualized
 
-    //!!put back
     this.svg.addEventListener("click", createPoint)
     
     // COMPLETE THIS OBJECT
@@ -255,48 +226,55 @@ function ConvexHull (ps, viewer) {
 
     // perform a single step of the Graham scan algorithm performed on ps
     this.step = function () {
+        let parent
+        let grandparent
+	 console.log(pointerID)
         if(firstStep)
         {
         drawLineSegment(stack[0], stack[1])
         firstStep = false
         }
         else{
+        
+        let nextID =  pointSet.points[pointerID].id
+        let cur = circles[nextID]
+    
+         parent = stack[stack.length - 1]
+        grandparent = stack[stack.length - 2]
+        
+    
+        if(rightTurn(cur, grandparent, parent)){
+                stack.push(cur)
+                drawLineSegment(parent, cur)
+                pointerID++
+        }else{
+
+
             
-            let current = pointSet.points[pointerID].id
-            current = circles[current]
-
-            let parent = stack[stack.length - 1]
-            let grandparent = stack[stack.length - 2]
-
-            console.log("current", current)
-            console.log("parent", parent)
-            console.log("grandparent", grandparent)
-
-            while (grandparent != null && !rightTurn(current, parent, grandparent)){
-                stack.pop()
-                let line = lineStack.pop()
-                SVG.removeChild(line)
+        if(!rightTurn(cur, grandparent, parent)){
+            lineStack.pop()
+            stack.pop()
+            let GPID = stack.length - 2 
+            if( GPID >= 0 ){
+            grandparent = stack[stack.length - 2 ]
+            }else{
+                grandparent = stack[0]
+            }
             
-                parent = stack[stack.length - 1]
-
-                let gid = stack.length - 2
-                if(gid >= 0){
-                grandparent = stack[gid]
-                }else{
-                   grandparent = null 
-                }
-                
-                console.log("current", current)
-                console.log("parent", parent)
-                console.log("grandparent", grandparent)
+            let PID = stack.length - 1
+            if(PID >= 0){
+            parent = stack[PID]
+            }else{
+                parent = stack[0]
             }
 
+            
+        }
         
-            stack.push(current)
-            drawLineSegment(current, parent)
+    }
     
-
-            pointerID++
+   
+       
         }
     
 	
