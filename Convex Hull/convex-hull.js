@@ -221,7 +221,6 @@ function ConvexHullViewer (svg, ps) {
     this.svg = svg;  // a n svg object where the visualization is drawn
     this.ps = ps;    // a point set of the points to be visualized
 
-    //!!put back
     this.svg.addEventListener("click", createPoint)
     
     // COMPLETE THIS OBJECT
@@ -261,7 +260,7 @@ function ConvexHull (ps, viewer) {
         firstStep = false
         }
         else{
-            
+
             let current = pointSet.points[pointerID].id
             current = circles[current]
 
@@ -297,6 +296,26 @@ function ConvexHull (ps, viewer) {
     
 
             pointerID++
+           
+            if(pointerID == pointSet.points.length){
+                pointSet.points.reverse()
+                firstStep = true
+                let leftMost = pointSet.points[0]
+                let secondElement = pointSet.points[1]
+                //we can index by the id of the points because the ids are the insert order and its the same order of the elements in the array of circle elements
+                while(stack.length > 0 ){
+                    stack.pop()
+                }
+                while(lineStack.length > 0 ){
+                    lineStack.pop()
+                }
+                let circle = circles[leftMost.id]
+                circle.setAttributeNS(null,"fill", "blue")
+                stack.push(circle)
+                stack.push(circles[secondElement.id])
+                pointerID = 2
+            }
+            
         }
     
 	
