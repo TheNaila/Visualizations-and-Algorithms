@@ -35,30 +35,30 @@ SVG.appendChild(circle)
 pointSet.addNewPoint(x,y)
 }
 
-// function testPoints(x,y){
-//     let rect = SVG.getBoundingClientRect(); 
-//     let c1 = document.createElementNS(SVG_NS, "circle")
-//     c1.classList.add("circle"); 
-//     c1.setAttributeNS(null, "cx", x)
-//     c1.setAttributeNS(null, "cy", y)
-//     c1.setAttributeNS(null, "r",5)
-//     SVG.appendChild(c1)
-//     pointSet.addNewPoint(x,y)
+function testPoints(x,y){
+    let rect = SVG.getBoundingClientRect(); 
+    let c1 = document.createElementNS(SVG_NS, "circle")
+    c1.classList.add("circle"); 
+    c1.setAttributeNS(null, "cx", x)
+    c1.setAttributeNS(null, "cy", y)
+    c1.setAttributeNS(null, "r",5)
+    SVG.appendChild(c1)
+    pointSet.addNewPoint(x,y)
     
-// }
-// testPoints(62, 62.125)
-// testPoints(64, 213.125)
-// testPoints(249, 81.125)
-// testPoints(23,140.125)
-// testPoints(140, 158.125)
-// testPoints(188, 75.125)
-// testPoints(259, 211.125)
-// testPoints(72, 130.125)
-// testPoints(317, 60.125)
-// testPoints(178, 231.125)
-// testPoints(216,118.125)
-// testPoints(396, 109.125)
-// testPoints(309, 151.125)
+}
+testPoints(62, 62.125)
+testPoints(64, 213.125)
+testPoints(249, 81.125)
+testPoints(23,140.125)
+testPoints(140, 158.125)
+testPoints(188, 75.125)
+testPoints(259, 211.125)
+testPoints(72, 130.125)
+testPoints(317, 60.125)
+testPoints(178, 231.125)
+testPoints(216,118.125)
+testPoints(396, 109.125)
+testPoints(550, 151.125)
 
 
 
@@ -221,7 +221,7 @@ function ConvexHullViewer (svg, ps) {
     this.svg = svg;  // a n svg object where the visualization is drawn
     this.ps = ps;    // a point set of the points to be visualized
 
-    this.svg.addEventListener("click", createPoint)
+    //this.svg.addEventListener("click", createPoint)
     
     // COMPLETE THIS OBJECT
 }
@@ -229,6 +229,7 @@ function ConvexHullViewer (svg, ps) {
 /*
  * An object representing an instance of the convex hull problem. A ConvexHull stores a PointSet ps that stores the input points, and a ConvexHullViewer viewer that displays interactions between the ConvexHull computation and the 
  */
+let firstLB = false
 function ConvexHull (ps, viewer) {
     this.ps = ps;          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
@@ -271,6 +272,8 @@ function ConvexHull (ps, viewer) {
             console.log("parent", parent)
             console.log("grandparent", grandparent)
 
+            if(!firstLB){
+
             while (grandparent != null && !rightTurn(current, parent, grandparent)){
                 stack.pop()
                 let line = lineStack.pop()
@@ -289,8 +292,9 @@ function ConvexHull (ps, viewer) {
                 console.log("parent", parent)
                 console.log("grandparent", grandparent)
             }
-
-        
+            }
+            
+            firstLB = false
             stack.push(current)
             drawLineSegment(current, parent)
     
@@ -299,20 +303,17 @@ function ConvexHull (ps, viewer) {
            
             if(pointerID == pointSet.points.length){
                 pointSet.points.reverse()
-                firstStep = true
+                //firstStep = true
                 let leftMost = pointSet.points[0]
                 let secondElement = pointSet.points[1]
+                 firstLB = true
                 //we can index by the id of the points because the ids are the insert order and its the same order of the elements in the array of circle elements
-                while(stack.length > 0 ){
-                    stack.pop()
-                }
-                while(lineStack.length > 0 ){
-                    lineStack.pop()
-                }
+              
                 let circle = circles[leftMost.id]
                 circle.setAttributeNS(null,"fill", "blue")
-                stack.push(circle)
                 stack.push(circles[secondElement.id])
+                stack.push(circle)
+                circles[secondElement.id].setAttributeNS(null,"fill", "red")
                 pointerID = 2
             }
             
