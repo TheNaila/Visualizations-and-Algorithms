@@ -41,16 +41,16 @@ const INPUT_FILE_NAME = "convex-hull-tests.json";
 
 function pointSetFromString(str) {
     const ps = new PointSet();
-    
+
     // start: thanks ChatGPT!
-    const regex = /-?\d+(\.\d+)?/g; 
+    const regex = /-?\d+(\.\d+)?/g;
     const vals = str.match(regex).map(Number);
     // end
 
     for (let i = 0; i < vals.length - 1; i += 2) {
-	let x = vals[i];
-	let y = vals[i+1];
-	ps.addNewPoint(x, y);
+        let x = vals[i];
+        let y = vals[i + 1];
+        ps.addNewPoint(x, y);
     }
 
     return ps;
@@ -68,27 +68,28 @@ function runTests() {
     let errorCounter = 0;
 
     for (let test of tests.results) {
-	let input = test.input;
-	let expectedOutput = test.output;
+        let input = test.input;
+        let expectedOutput = test.output;
 
-	let ps = pointSetFromString(input);
-	let ch = new ConvexHull(ps, null);
-	
-	let actualOutput = ch.getConvexHull().toString();
-	
-	if (expectedOutput != actualOutput) {
+        let ps = pointSetFromString(input);
+        let ch = new ConvexHull(ps, null);
+
+        let actualOutput = ch.getConvexHull().toString();
+
+        if (expectedOutput != actualOutput) {
             console.log(`Test failed\n` +
-			`  input: ${input}\n` +
-			`  expected output: ${expectedOutput}` +
-			`  actual output: ${actualOutput}`);
+                `  input: ${input}\n` +
+                `  expected output: ${expectedOutput}` +
+                `  actual output: ${actualOutput}`);
             if (++errorCounter >= 5) {
-		console.log("You have failed 5 test cases. The tester will now terminate.");
+                console.log("You have failed 5 test cases. The tester will now terminate.");
+                return;
             }
-	}
+        }
     }
 
     if (errorCounter == 0) {
-	console.log("Great job!! You passed all of the test cases.");
+        console.log("Great job!! You passed all of the test cases.");
     }
 
 }
