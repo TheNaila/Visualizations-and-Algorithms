@@ -57,8 +57,8 @@ testPoints(72, 130.125)
 testPoints(317, 60.125)
 testPoints(178, 231.125)
 testPoints(216,118.125)
-testPoints(396, 109.125)
-testPoints(550, 151.125)
+testPoints(500, 109.125) //396
+// testPoints(550, 151.125)
 
 
 
@@ -78,16 +78,36 @@ function rightTurn(current, parent, grandparent){
     let dot_product = (vperp_x * vector_u_x) + (vperp_y * vector_u_y)
     
     if(dot_product < 0){
-        console.log(true)
         return true
     }
-    console.log(false)
+    console.log("false")
     return false
 }
 
 let firstStep = true
 let pointerID = 2
 
+function rightTurnPS(current, parent, grandparent){
+    let bx = parent.x
+    let by = parent.y
+    let ax = grandparent.x
+    let ay = grandparent.y
+    let cx = current.x
+    let cy = current.y
+    let vector_u_x = (bx - ax)
+    let vector_u_y = (by - ay)
+    let vector_v_x = (cx - bx)
+    let vector_v_y = (cy - by)
+    let vperp_x = (- vector_v_y)
+    let vperp_y = (vector_v_x)
+    let dot_product = (vperp_x * vector_u_x) + (vperp_y * vector_u_y)
+    
+    if(dot_product < 0){
+        return true
+    }
+    console.log("false")
+    return false
+}
 
 function drawLineSegment(pt1, pt2){
 let line = document.createElementNS(SVG_NS, "line")
@@ -210,6 +230,7 @@ function PointSet () {
 }
 
 let cv = new ConvexHull(pointSet, new ConvexHullViewer(SVG, pointSet))
+cv.getConvexHull()
 
 let startbtn = document.getElementById("start-btn")
 startbtn.addEventListener("click", cv.start)
@@ -221,7 +242,7 @@ function ConvexHullViewer (svg, ps) {
     this.svg = svg;  // a n svg object where the visualization is drawn
     this.ps = ps;    // a point set of the points to be visualized
 
-    //this.svg.addEventListener("click", createPoint)
+    this.svg.addEventListener("click", createPoint)
     
     // COMPLETE THIS OBJECT
 }
@@ -229,7 +250,6 @@ function ConvexHullViewer (svg, ps) {
 /*
  * An object representing an instance of the convex hull problem. A ConvexHull stores a PointSet ps that stores the input points, and a ConvexHullViewer viewer that displays interactions between the ConvexHull computation and the 
  */
-let firstLB = false
 function ConvexHull (ps, viewer) {
     this.ps = ps;          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
@@ -268,12 +288,7 @@ function ConvexHull (ps, viewer) {
             let parent = stack[stack.length - 1]
             let grandparent = stack[stack.length - 2]
 
-            console.log("current", current)
-            console.log("parent", parent)
-            console.log("grandparent", grandparent)
-
-            if(!firstLB){
-
+            
             while (grandparent != null && !rightTurn(current, parent, grandparent)){
                 stack.pop()
                 let line = lineStack.pop()
@@ -287,14 +302,10 @@ function ConvexHull (ps, viewer) {
                 }else{
                    grandparent = null 
                 }
-                
-                console.log("current", current)
-                console.log("parent", parent)
-                console.log("grandparent", grandparent)
-            }
+        
             }
             
-            firstLB = false
+        
             stack.push(current)
             drawLineSegment(current, parent)
     
@@ -302,19 +313,19 @@ function ConvexHull (ps, viewer) {
             pointerID++
            
             if(pointerID == pointSet.points.length){
+                console.log(stack)
                 pointSet.points.reverse()
-                //firstStep = true
-                let leftMost = pointSet.points[0]
-                let secondElement = pointSet.points[1]
-                 firstLB = true
+                let rightMost = pointSet.points[0].id
                 //we can index by the id of the points because the ids are the insert order and its the same order of the elements in the array of circle elements
-              
-                let circle = circles[leftMost.id]
-                circle.setAttributeNS(null,"fill", "blue")
-                stack.push(circles[secondElement.id])
-                stack.push(circle)
-                circles[secondElement.id].setAttributeNS(null,"fill", "red")
+                let lowerCFirst = circles[rightMost]
+                lowerCFirst.setAttributeNS(null,"fill", "red")
+
+                let secondElementID = pointSet.points[1].id
+                let secondElement = circles[secondElementID]
+                secondElement.setAttributeNS(null,"fill", "blue")
                 pointerID = 2
+               
+            
             }
             
         }
@@ -330,9 +341,5 @@ function ConvexHull (ps, viewer) {
     // in clockwise order, starting from the left-most point, breaking
     // ties by minimum y-value.
     this.getConvexHull = function () {
-        //!fix
-	 let convexStack = new PointSet()
-     convexStack.points = stack
-	
-    }
+
 }
