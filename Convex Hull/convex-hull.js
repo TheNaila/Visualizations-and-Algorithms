@@ -7,8 +7,6 @@ SVG.setAttributeNS(SVG_NS,"width", SVG_WIDTH)
 SVG.setAttributeNS(null, "height", SVG_HEIGHT)
 let pointSet = new PointSet()
 
-
-
 let circles = [] 
 //need an array of the circle refs themselves because when we add the points to pointset all we are doing is adding the x and y coordinates and creating a new object
 //We want to retain access to the circle object
@@ -20,19 +18,18 @@ let stack = []
 //Convex Hull points stack 
 
 function createPoint(e){
-
-rect = SVG.getBoundingClientRect(); 
-//ensures that we are getting the circle element coordinates relative to our viewport and not the page 
-let x = e.clientX - rect.left
-let y = e.clientY - rect.top
-let circle = document.createElementNS(SVG_NS,"circle"); 
-circle.classList.add("circle"); 
-circle.setAttributeNS(null, "cy", y)
-circle.setAttributeNS(null, "cx", x)
-circle.setAttributeNS(null, "r",5)
-//adding the circle to the page and the points []
-SVG.appendChild(circle)
-pointSet.addNewPoint(x,y)
+    rect = SVG.getBoundingClientRect(); 
+    //ensures that we are getting the circle element coordinates relative to our viewport and not the page 
+    let x = e.clientX - rect.left
+    let y = e.clientY - rect.top
+    let circle = document.createElementNS(SVG_NS,"circle"); 
+    circle.classList.add("circle"); 
+    circle.setAttributeNS(null, "cy", y)
+    circle.setAttributeNS(null, "cx", x)
+    circle.setAttributeNS(null, "r",5)
+    //adding the circle to the page and the points []
+    SVG.appendChild(circle)
+    pointSet.addNewPoint(x,y)
 }
 
 function testPoints(x,y){
@@ -58,9 +55,7 @@ testPoints(317, 60.125)
 testPoints(178, 231.125)
 testPoints(216,118.125)
 testPoints(500, 109.125) //396
-// testPoints(550, 151.125)
-
-
+testPoints(550, 151.125)
 
 function rightTurn(current, parent, grandparent){
     let bx = parent.getAttributeNS(null, "cx")
@@ -110,19 +105,17 @@ function rightTurnPS(current, parent, grandparent){
 }
 
 function drawLineSegment(pt1, pt2){
-let line = document.createElementNS(SVG_NS, "line")
-line.setAttributeNS(null, "x1", pt1.getAttributeNS(null, "cx"))
-line.setAttributeNS(null, "y1", pt1.getAttributeNS(null, "cy"))
-line.setAttributeNS(null, "x2", pt2.getAttributeNS(null, "cx"))
-line.setAttributeNS(null, "y2", pt2.getAttributeNS(null, "cy"))
-line.setAttributeNS(null, "stroke-width", 2)
-line.setAttributeNS(null, "stroke", "black")
-SVG.appendChild(line)
-lineStack.push(line)
+    let line = document.createElementNS(SVG_NS, "line")
+    line.setAttributeNS(null, "x1", pt1.getAttributeNS(null, "cx"))
+    line.setAttributeNS(null, "y1", pt1.getAttributeNS(null, "cy"))
+    line.setAttributeNS(null, "x2", pt2.getAttributeNS(null, "cx"))
+    line.setAttributeNS(null, "y2", pt2.getAttributeNS(null, "cy"))
+    line.setAttributeNS(null, "stroke-width", 2)
+    line.setAttributeNS(null, "stroke", "black")
+    SVG.appendChild(line)
+    lineStack.push(line)
 
 }
-
-
 
 function Point (x, y, id) {
     this.x = x;
@@ -229,14 +222,7 @@ function PointSet () {
     }
 }
 
-let cv = new ConvexHull(pointSet, new ConvexHullViewer(SVG, pointSet))
-cv.getConvexHull()
 
-let startbtn = document.getElementById("start-btn")
-startbtn.addEventListener("click", cv.start)
-
-let stepbtn = document.getElementById("step-btn")
-stepbtn.addEventListener("click", cv.step)
 
 function ConvexHullViewer (svg, ps) {
     this.svg = svg;  // a n svg object where the visualization is drawn
@@ -247,6 +233,7 @@ function ConvexHullViewer (svg, ps) {
     // COMPLETE THIS OBJECT
 }
 
+
 /*
  * An object representing an instance of the convex hull problem. A ConvexHull stores a PointSet ps that stores the input points, and a ConvexHullViewer viewer that displays interactions between the ConvexHull computation and the 
  */
@@ -254,7 +241,7 @@ function ConvexHull (ps, viewer) {
     this.ps = ps;          // a PointSet storing the input to the algorithm
     this.viewer = viewer;  // a ConvexHullViewer for this visualization
 
-    // start a visualization of the Graham scan algorithm performed on ps
+    //start a visualization of the Graham scan algorithm performed on ps
     this.start = function () {
 	
     circles = document.getElementsByTagNameNS(SVG_NS,"circle")
@@ -269,7 +256,6 @@ function ConvexHull (ps, viewer) {
     circle.setAttributeNS(null,"fill", "red")
     stack.push(circle)
     stack.push(circles[secondElement.id])
-   
 
     }
 
@@ -342,4 +328,62 @@ function ConvexHull (ps, viewer) {
     // ties by minimum y-value.
     this.getConvexHull = function () {
 
+        
+       let stackPS = []
+       
+       this.ps.sort()
+       let points = this.ps.points
+       stackPS.push(points[0])
+       stackPS.push(points[1])
+       
+       let lowerC = false
+       
+       for (let index = 2; index < points.length; index++) {
+         let parent = stackPS[stackPS.length - 1]
+         let grandparent = stackPS[stackPS.length - 2]
+         let current = points[index]
+
+
+         while(grandparent != null && !rightTurnPS(current, parent, grandparent)){
+            stackPS.pop()
+            parent = stackPS[stackPS.length - 1]
+
+            let gid = stackPS.length - 2
+            if(gid >= 0){
+            grandparent = stackPS[gid]
+            }else{
+               grandparent = null 
+            }
+            
+         }
+         
+         stackPS.push(current)
+         
+        if(!lowerC && index == points.length - 1){
+            index = 2
+            this.ps.reverse()
+            points = this.ps.points
+            lowerC = true
+        }
+         
+       }
+
+       console.log("stackPS", stackPS)
+       
+    }
 }
+let cv = new ConvexHull(pointSet, new ConvexHullViewer(SVG, pointSet))
+cv.getConvexHull()
+
+let startbtn = document.getElementById("start-btn")
+startbtn.addEventListener("click", cv.start)
+
+let stepbtn = document.getElementById("step-btn")
+stepbtn.addEventListener("click", cv.step)
+
+// try {
+//     exports.PointSet = PointSet;
+//     exports.ConvexHull = ConvexHull;
+//   } catch (e) {
+//     console.log("not running in Node");
+//   }
