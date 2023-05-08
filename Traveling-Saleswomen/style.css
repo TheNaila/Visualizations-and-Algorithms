@@ -1,3 +1,97 @@
-.circles{
-    background-color: pink;
+
+
+/* https://www.vecteezy.com/vector-art/4578715-view-of-buildings-and-city-street */
+.city-background {
+    background-image: url("city-background.jpg");
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-attachment: fixed;
+}
+
+/* https://blog.logrocket.com/advanced-effects-with-css-background-blend-modes-4b750198522a/ */
+.spectrum-background { 
+    background:
+        linear-gradient(red, transparent),
+        linear-gradient(to top left, lime, transparent),
+        linear-gradient(to top right, blue, transparent);
+    background-blend-mode: screen;
+}
+
+body {
+	width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0px;
+	padding-left: 100px;
+	padding-right: 100px;
+	padding-top: 20px;
+	padding-bottom: 100px;
+	background-color: rgb(208, 232, 239);
+}
+
+h1 {
+	font-size: 52px;
+	font-family: Geneva, Tahoma, sans-serif;
+	text-align: center;
+}
+
+header {
+    padding-bottom: 25px;
+    /* background-color: rgb(252, 247, 222); */
+}
+
+nav a {
+	margin-left: 20px;
+	margin-right: 20px;
+	border: 3px solid black;
+	border-radius: 25px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 43px;
+	padding-right: 43px;
+	font-family: "Century Gothic";
+	color: white;
+	text-decoration: none;
+	background-color: rgb(23, 176, 12);
+
+}
+
+a#currPage {
+	font-weight: bold;
+	color: blue;
+    background-color: rgb(255, 148, 114);
+}
+
+a:hover {
+	text-decoration: underline;
+	transition: 0.3s;
+	background-color: rgb(255, 148, 114);
+}
+
+p {
+	font-family: Arial;
+}
+
+svg {
+    display: block; /* svg elements are inline by default */
+    margin: 10px auto;    
+    border: 5px black solid;
+}
+
+button{
+	width: "200";
+	height: "200"; 
+}
+
+p{
+	position: relative;
+	top: 100;
+	
+}
+circle{
+	z-index: 4;
+}
+
+line{
+	z-index: 5;
 }
