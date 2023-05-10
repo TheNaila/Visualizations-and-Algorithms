@@ -77,21 +77,3 @@ svg {
     margin: 10px auto;    
     border: 5px black solid;
 }
-
-button{
-	width: "200";
-	height: "200"; 
-}
-
-p{
-	position: relative;
-	top: 100;
-	
-}
-circle{
-	z-index: 4;
-}
-
-line{
-	z-index: 5;
-}
