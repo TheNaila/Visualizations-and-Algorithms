@@ -4,6 +4,8 @@ SVG.addEventListener("click", createCircles)
 
 const lines_gp = document.getElementById("lines_gp")
 
+let id = 0
+
 //allow users to start adding weights 
 const add_weights = document.getElementById("add_weights")
 add_weights.innerHTML = "Add Weights"
@@ -23,7 +25,6 @@ class Graph {
     addNode = function (node) {
         this.nodes.push(node)
 
-        //!should make it undirected
     }
     foundEdge(circle1, circle2) {
         for (let index = 0; index < this.nodes.length; index++) {
@@ -42,12 +43,13 @@ class Graph {
 }
 
 class Node {
-    value = null
+    id = null
+    circle_ref = null
     neighbors = new Map()
     line_weights = new Map()
 
-    constructor(value) {
-        this.value = value
+    constructor(circle) {
+        this.circle_ref = circle
     }
 
     addNeighbor = function (node, edge) {
@@ -57,6 +59,12 @@ class Node {
     addWeight = function (node, num) {
         this.line_weights.set(node, num)
     }
+    setID(id){
+        if(this.id == null){
+            this.id = id
+        }
+       
+    }
 }
 
 //adjacency list
@@ -64,6 +72,8 @@ let graph = new Graph()
 
 more_nodes.innerHTML = "Add More Nodes"
 more_nodes.addEventListener("click", () => {
+    //!
+    print_adj_list()
     SVG.addEventListener("click", createCircles)
 })
 
@@ -90,18 +100,8 @@ function createCircles(e) {
 }
 //the two circles selected for which a line will be drawn connecting them.will only ever have two elements 
 let selected_circles = []
-//hols reference to the current line being contemplated
+//holds reference to the current line being contemplated
 let line_arr = []
-
-/*
-
-prevent there from being multiple lines between nodes
-
-save a previous graph 
-
-create adjacency list for nodes and line connecting nodes
-
-*/
 
 function line_funct(e) {
     SVG.removeEventListener("click", createCircles)
@@ -136,13 +136,13 @@ function selected(e) {
 
     //if circle is clicked thrice in a row, remove it 
     if (to_remove == e.target) {
-        e.target.setAttributeNS(null, "fill", "red")
         for (let index = 0; index < graph.nodes.length; index++) {
-            if (graph.nodes[index].value == e.target) {
-                for (const [key, value] of graph.nodes[index].neighbors) {
-                    key.neighbors.delete(graph.nodes[index]) //remove node + line from neighbors adj
-                    lines_gp.removeChild(graph.nodes[index].neighbors.get(key)) // remove line from svg
-                    graph.nodes[index].neighbors.delete(key) //remove all neighbors from node
+            if (graph.nodes[index].circle_ref == e.target) { //node to be deleted 
+                console.log("node: ", e.target)
+                for (let [key, value] of graph.nodes[index].neighbors.entries()) { //neighbors and connected lines to node to be deleted
+                   key.neighbors.delete(graph.nodes[index]) //remove me + line from neighbors adj
+                   lines_gp.removeChild(value) // remove line from svg
+                   graph.nodes[index].neighbors.delete(key) //remove all neighbors from node
                 }
 
                 graph.nodes.splice(index, 1)
@@ -150,12 +150,9 @@ function selected(e) {
             }
 
         }
-        //! 
-    
 
         SVG.removeChild(e.target)
         return
-        //!remove lines connected to the circle
     }
 
     selected_circles.push(e.target)
@@ -189,11 +186,10 @@ function selected(e) {
         if (graph.foundEdge(circle1, circle2)) {
             circle1.setAttributeNS(null, "fill", "black")
             circle2.setAttributeNS(null, "fill", "black")
+            console.log("edge already exists")
             return
         }
 
-
-        //!will add circles to adj list at this point because its more sure that they are included
 
         line.setAttributeNS(null, "x2", x)
         line.setAttributeNS(null, "y2", y)
@@ -201,48 +197,48 @@ function selected(e) {
 
 
         circle1.setAttributeNS(null, "fill", "black")
-
-        let node = new Node(circle1)
-        let neighbor = new Node(circle2)
-
         circle2.setAttributeNS(null, "fill", "black")
-        // check if circle is in adj_list 
+
+        let circle1_node = new Node(circle1)
+        let circle2_node = new Node(circle2)
+
         for (let index = 0; index < graph.nodes.length; index++) {
-            if (graph.nodes[index].value == circle1) {
-                graph.nodes[index].addNeighbor(neighbor, line)
+            if(graph.nodes[index].circle_ref == circle1 ){
                 for (let i = 0; i < graph.nodes.length; i++) {
-                    if (graph.nodes[i].value == circle2) {
-                        graph.nodes[i].addNeighbor(node, line)
+                    if(graph.nodes[i].circle_ref == circle2){
+                        graph.nodes[index].addNeighbor(graph.nodes[i], line)
+                        graph.nodes[i].addNeighbor(graph.nodes[index], line)
                         return
                     }
-                }
-                neighbor.addNeighbor(node, line)
-                graph.addNode(neighbor)
-                return
+                    circle2_node.addNeighbor(graph.nodes[index], line) 
+                    graph.addNode(circle2_node)
+                    graph.nodes[index].addNeighbor(circle2_node, line)
+                    return 
 
+                }
             }
-            if (graph.nodes[index].value == circle2) {
-                graph.nodes[index].addNeighbor(node, line)
+            if(graph.nodes[index].circle_ref == circle2 ){
                 for (let i = 0; i < graph.nodes.length; i++) {
-                    if (graph.nodes[i].value == circle1) {
-                        graph.nodes[i].addNeighbor(neighbor, line)
+                    if(graph.nodes[i].circle_ref == circle1){
+                        graph.nodes[index].addNeighbor(graph.nodes[i], line)
+                        graph.nodes[i].addNeighbor(graph.nodes[index], line)
                         return
                     }
-                }
-                node.addNeighbor(neighbor, line)
-                graph.addNode(node)
-                return
-            }
+                    circle1_node.addNeighbor(graph.nodes[index], line)
+                    graph.addNode(circle1_node)
+                    graph.nodes[index].addNeighbor(circle1_node, line)
+                    return 
 
+                }
+            }
+            
         }
+       circle1_node.addNeighbor(circle2_node, line) 
+       circle2_node.addNeighbor(circle1_node, line)
+       graph.addNode(circle1_node)
+       graph.addNode(circle2_node)
+       
 
-
-        node.addNeighbor(neighbor, line)
-
-        neighbor.addNeighbor(node, line)
-
-        graph.addNode(node)
-        graph.addNode(neighbor)
     }
 
 }
@@ -287,12 +283,7 @@ function line_selected(e) {
 
 
 function strt_add_weights(e) {
-    /*
-    pre-decide where each number should go to be close to edge but not overlaping others (to the right/center of each edge)
-    ---> over 5px or (distance between edge and closest thing to me/2 that is at least 1 pixel from both)
-    create alert box
-    press numbers
-    */
+
     let lines = document.querySelectorAll("line")
     console.log(lines)
     SVG.removeEventListener("click", createCircles)
@@ -308,3 +299,21 @@ function strt_add_weights(e) {
 function solve() {
 
 }
+
+function print_adj_list(){
+for (let index = 0; index < graph.nodes.length; index++) {
+    graph.nodes[index].setID(index)
+    
+}
+for (let index = 0; index < graph.nodes.length; index++) {
+    let str = graph.nodes[index].id + " : "
+        for (const [key, value] of graph.nodes[index].neighbors ) {
+            str += key.id + " "
+        }
+        console.log(str)
+    }
+    
+}
+
+//!put adjancy matrix on screen 
+//allow deletion through matrix
