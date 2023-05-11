@@ -8,18 +8,9 @@ const lines_gp = document.getElementById("lines_gp")
 const add_weights = document.getElementById("add_weights")
 add_weights.innerHTML = "Add Weights"
 add_weights.addEventListener("click", strt_add_weights)
-add_weights.classList.add("btn")
-
-//allows users to see the adj list when the btn is clicked 
-const show_adj_list = document.getElementById("show_adj_list")
-show_adj_list.innerHTML = "Show Adjacency List"
-show_adj_list.style.marginLeft = "25px"
-show_adj_list.classList.add("btn")
-show_adj_list.addEventListener("click", print_adj_list)
 
 //allow users to create more circles when button created
 const more_nodes = document.getElementById("more_nodes")
-
 
 
 /*
@@ -73,11 +64,11 @@ class Node {
     addWeight = function (node, num) {
         this.line_weights.set(node, num)
     }
-    setID(id) {
-        if (this.id == null) {
+    setID(id){
+        if(this.id == null){
             this.id = id
         }
-
+       
     }
 }
 
@@ -86,13 +77,7 @@ let graph = new Graph()
 
 //button that allows nodes to be added after users begin manipulating edges. Otherwise after setting edges, users cant add more nodes
 more_nodes.innerHTML = "Add More Nodes"
-more_nodes.style.marginLeft = "25px"
-
-more_nodes.classList.add("btn")
-
 more_nodes.addEventListener("click", () => {
-
-
     SVG.addEventListener("click", createCircles)
 })
 
@@ -110,8 +95,6 @@ function createCircles(e) {
     circle.classList.add("circles")
     SVG.appendChild(circle)
     e.stopPropagation()
-    let node = new Node(circle)
-    graph.nodes.push(node)
 
     //listen for when the circle is clicked
     circle.addEventListener("click", selected)
@@ -155,19 +138,15 @@ function selected(e) {
         return
     }
 
-    //if circle is clicked thrice in a row, remove it
-    //! remove from neighbors and current node 
+    //if circle is clicked thrice in a row, remove it 
     if (to_remove == e.target) {
         for (let index = 0; index < graph.nodes.length; index++) {
             if (graph.nodes[index].circle_ref == e.target) { //node to be deleted 
                 console.log("node: ", e.target)
                 for (let [key, value] of graph.nodes[index].neighbors.entries()) { //neighbors and connected lines to node to be deleted
-                    console.log("neighbors: ", key.circle_ref)
-                    console.log("line", value)
-                    key.neighbors.delete(graph.nodes[index]) //remove me + line from neighbors adj
-                    lines_gp.removeChild(value) // remove line from svg
-                    graph.nodes[index].neighbors.delete(key) //remove all neighbors from node
-                    console.log("end")
+                   key.neighbors.delete(graph.nodes[index]) //remove me + line from neighbors adj
+                   lines_gp.removeChild(value) // remove line from svg
+                   graph.nodes[index].neighbors.delete(key) //remove all neighbors from node
                 }
 
                 graph.nodes.splice(index, 1)
@@ -225,43 +204,53 @@ function selected(e) {
         circle2.setAttributeNS(null, "fill", "black")
 
         //checks whether or not nodes are already present in the adjancy matrix and adds them accordingly
-
         let circle1_node = new Node(circle1)
         let circle2_node = new Node(circle2)
 
         for (let index = 0; index < graph.nodes.length; index++) {
-            if (graph.nodes[index].circle_ref == circle1) {
-                console.log("circle1 found", circle1)
+            if(graph.nodes[index].circle_ref == circle1 ){
                 for (let i = 0; i < graph.nodes.length; i++) {
-                    if (graph.nodes[i].circle_ref == circle2) {
-                        console.log("circle2 found", circle2)
-
-                       console.log(graph.nodes[index].addNeighbor(graph.nodes[i], line))
-                         console.log(graph.nodes[i].addNeighbor(graph.nodes[index], line))
-                        return 
-                    }
-                }
-            }
-            if (graph.nodes[index].circle_ref == circle2) {
-                console.log("circle2 found", circle2)
-                for (let i = 0; i < graph.nodes.length; i++) {
-                    if (graph.nodes[i].circle_ref == circle1) {
-
-                        console.log("circle1 found", circle1)
-                        console.log(graph.nodes[index].addNeighbor(graph.nodes[i], line))
-                        console.log(graph.nodes[i].addNeighbor(graph.nodes[index], line))
+                    if(graph.nodes[i].circle_ref == circle2){
+                        graph.nodes[index].addNeighbor(graph.nodes[i], line)
+                        graph.nodes[i].addNeighbor(graph.nodes[index], line)
                         return
                     }
+                    circle2_node.addNeighbor(graph.nodes[index], line) 
+                    graph.addNode(circle2_node)
+                    graph.nodes[index].addNeighbor(circle2_node, line)
+                    return 
+
                 }
             }
+            if(graph.nodes[index].circle_ref == circle2 ){
+                for (let i = 0; i < graph.nodes.length; i++) {
+                    if(graph.nodes[i].circle_ref == circle1){
+                        graph.nodes[index].addNeighbor(graph.nodes[i], line)
+                        graph.nodes[i].addNeighbor(graph.nodes[index], line)
+                        return
+                    }
+                    circle1_node.addNeighbor(graph.nodes[index], line)
+                    graph.addNode(circle1_node)
+                    graph.nodes[index].addNeighbor(circle1_node, line)
+                    return 
 
+                }
+            }
+            
         }
+       circle1_node.addNeighbor(circle2_node, line) 
+       circle2_node.addNeighbor(circle1_node, line)
+       graph.addNode(circle1_node)
+       graph.addNode(circle2_node)
+       
 
     }
+
 }
+
 //allows users to input weight for an edge when edge is clicked
 function line_selected(e) {
-
+    let html_bd = document.querySelector("body")
     let prompt = window.prompt("Enter a value for the selected edge")
 
     let rect = SVG.getBoundingClientRect();
@@ -320,65 +309,20 @@ function solve() {
 
 //assigns id to nodes and prints adj matrix
 
-let need_update = false
-let html_bd = document.querySelector("body")
-let adj_table = document.createElement("table")
-
-function print_adj_list() {
-    if (need_update == true) {
-
-        adj_table.innerHTML = ""
-
-    }
-
-
-    need_update = true
-    for (let index = 0; index < graph.nodes.length; index++) {
-        graph.nodes[index].setID(index)
-        console.log(graph.nodes[index].id)
-        graph.nodes[index].circle_ref.innerHTML = index
-
-    }
-
-
-    let th_row = document.createElement("tr")
-
-    let col_1 = document.createElement("th")
-    col_1.innerHTML = "Vertex"
-    col_1.style.width = "100px"
-
-    let col_2 = document.createElement("th")
-    col_2.innerHTML = "Neighbors"
-
-    th_row.appendChild(col_1)
-    th_row.appendChild(col_2)
-    adj_table.appendChild(th_row)
-
-
-    html_bd.appendChild(adj_table)
-
-
-    for (let index = 0; index < graph.nodes.length; index++) {
-        let row = document.createElement("tr")
-        let vertex = document.createElement("td")
-        vertex.innerHTML = graph.nodes[index].id
-        row.appendChild(vertex)
-
-        let neighbors = document.createElement("td")
-
-        for (const [key, value] of graph.nodes[index].neighbors) {
-
-            let elem = document.createElement("span")
-            elem.style.paddingRight = "10px"
-            elem.innerHTML = key.id
-            neighbors.appendChild(elem)
+function print_adj_list(){
+for (let index = 0; index < graph.nodes.length; index++) {
+    graph.nodes[index].setID(index)
+    
+}
+for (let index = 0; index < graph.nodes.length; index++) {
+    let str = graph.nodes[index].id + " : "
+        for (const [key, value] of graph.nodes[index].neighbors ) {
+            str += key.id + " "
         }
-
-        row.appendChild(neighbors)
-        adj_table.appendChild(row)
+        console.log(str)
     }
-
+    
 }
 
-//!put adjancy matrix on screen
+//!put adjancy matrix on screen 
 //allow deletion through matrix

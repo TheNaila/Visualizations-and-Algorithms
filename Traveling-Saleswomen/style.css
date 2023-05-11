@@ -56,6 +56,25 @@ nav a {
 
 }
 
+.btn{
+border-radius: 25px;
+color: white;
+font-family: "Century Gothic";
+background-color: rgb(23, 176, 12);
+}
+
+.btn:hover{
+text-decoration: underline;
+transition: 0.3s;
+background-color: rgb(255, 148, 114);
+}
+
+.btn:active{
+	font-weight: bold;
+	color: blue;
+    background-color: rgb(255, 148, 114);
+}
+
 a#currPage {
 	font-weight: bold;
 	color: blue;
