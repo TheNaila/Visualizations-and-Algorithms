@@ -4,12 +4,6 @@ SVG.addEventListener("click", createCircles)
 
 const lines_gp = document.getElementById("lines_gp")
 
-//allow users to start adding weights 
-const add_weights = document.getElementById("add_weights")
-add_weights.innerHTML = "Add Weights"
-add_weights.addEventListener("click", strt_add_weights)
-add_weights.classList.add("btn")
-
 //allows users to see the adj list when the btn is clicked 
 const show_adj_list = document.getElementById("show_adj_list")
 show_adj_list.innerHTML = "Show Adjacency List"
@@ -20,15 +14,6 @@ show_adj_list.addEventListener("click", print_adj_list)
 //allow users to create more circles when button created
 const more_nodes = document.getElementById("more_nodes")
 
-
-
-/*
-TODO 
-!make directed edges different weights 
-!if theres an edge  without a weight, set it to infinity 
-!divide by half 
-!add structure to weights
-*/
 class Graph {
     nodes = []
     edges = []
@@ -60,7 +45,6 @@ class Node {
     id = null
     circle_ref = null
     neighbors = new Map()
-    line_weights = new Map()
 
     constructor(circle) {
         this.circle_ref = circle
@@ -70,14 +54,12 @@ class Node {
         this.neighbors.set(node, edge)
     }
 
-    addWeight = function (node, num) {
-        this.line_weights.set(node, num)
-    }
     setID(id) {
-        if (this.id == null) {
-            this.id = id
-        }
+        this.id = id
 
+    }
+    getRef = function () {
+        return this.circle_ref
     }
 }
 
@@ -86,7 +68,6 @@ let graph = new Graph()
 
 //button that allows nodes to be added after users begin manipulating edges. Otherwise after setting edges, users cant add more nodes
 more_nodes.innerHTML = "Add More Nodes"
-more_nodes.style.marginLeft = "25px"
 
 more_nodes.classList.add("btn")
 
@@ -117,12 +98,11 @@ function createCircles(e) {
     circle.addEventListener("click", selected)
 
 }
+
 //the two circles selected for which a line will be drawn connecting them.will only ever have two elements 
 let selected_circles = []
 //holds reference to the current line being contemplated
 let line_arr = []
-
-//!need to check function and adj list after edge is removed
 
 function line_funct(e) {
     SVG.removeEventListener("click", createCircles)
@@ -130,6 +110,7 @@ function line_funct(e) {
     for (let index = 0; index < graph.nodes.length; index++) {
         for (const [key, value] of graph.nodes[index].neighbors) {
             if (value == e.target) {
+                key.neighbors.delete(key)
                 graph.nodes[index].neighbors.delete(key)
             }
         }
@@ -141,7 +122,6 @@ function line_funct(e) {
 let to_remove;
 
 
-//! need to resolve the case that a circle is selected and then a button is clicked
 function selected(e) {
 
     //checks if the circle was clicked twice in a row 
@@ -156,18 +136,16 @@ function selected(e) {
     }
 
     //if circle is clicked thrice in a row, remove it
-    //! remove from neighbors and current node 
     if (to_remove == e.target) {
         for (let index = 0; index < graph.nodes.length; index++) {
             if (graph.nodes[index].circle_ref == e.target) { //node to be deleted 
-                console.log("node: ", e.target)
+
                 for (let [key, value] of graph.nodes[index].neighbors.entries()) { //neighbors and connected lines to node to be deleted
-                    console.log("neighbors: ", key.circle_ref)
-                    console.log("line", value)
+
                     key.neighbors.delete(graph.nodes[index]) //remove me + line from neighbors adj
                     lines_gp.removeChild(value) // remove line from svg
                     graph.nodes[index].neighbors.delete(key) //remove all neighbors from node
-                    console.log("end")
+
                 }
 
                 graph.nodes.splice(index, 1)
@@ -211,15 +189,12 @@ function selected(e) {
         if (graph.foundEdge(circle1, circle2)) {
             circle1.setAttributeNS(null, "fill", "black")
             circle2.setAttributeNS(null, "fill", "black")
-            console.log("edge already exists")
             return
         }
-
 
         line.setAttributeNS(null, "x2", x)
         line.setAttributeNS(null, "y2", y)
         lines_gp.append(line)
-
 
         circle1.setAttributeNS(null, "fill", "black")
         circle2.setAttributeNS(null, "fill", "black")
@@ -231,25 +206,22 @@ function selected(e) {
 
         for (let index = 0; index < graph.nodes.length; index++) {
             if (graph.nodes[index].circle_ref == circle1) {
-                console.log("circle1 found", circle1)
                 for (let i = 0; i < graph.nodes.length; i++) {
                     if (graph.nodes[i].circle_ref == circle2) {
-                        console.log("circle2 found", circle2)
 
-                       console.log(graph.nodes[index].addNeighbor(graph.nodes[i], line))
-                         console.log(graph.nodes[i].addNeighbor(graph.nodes[index], line))
-                        return 
+                        graph.nodes[index].addNeighbor(graph.nodes[i], line)
+                        graph.nodes[i].addNeighbor(graph.nodes[index], line)
+                        return
                     }
                 }
             }
             if (graph.nodes[index].circle_ref == circle2) {
-                console.log("circle2 found", circle2)
                 for (let i = 0; i < graph.nodes.length; i++) {
                     if (graph.nodes[i].circle_ref == circle1) {
 
-                        console.log("circle1 found", circle1)
-                        console.log(graph.nodes[index].addNeighbor(graph.nodes[i], line))
-                        console.log(graph.nodes[i].addNeighbor(graph.nodes[index], line))
+                        graph.nodes[index].addNeighbor(graph.nodes[i], line)
+                        graph.nodes[i].addNeighbor(graph.nodes[index], line)
+
                         return
                     }
                 }
@@ -259,66 +231,93 @@ function selected(e) {
 
     }
 }
-//allows users to input weight for an edge when edge is clicked
-function line_selected(e) {
-
-    let prompt = window.prompt("Enter a value for the selected edge")
-
-    let rect = SVG.getBoundingClientRect();
-
-    let x1 = parseInt(e.target.getAttributeNS(null, "x1"))
-
-    let y1 = parseInt(e.target.getAttributeNS(null, "y1"))
-
-    let x2 = parseInt(e.target.getAttributeNS(null, "x2"))
-
-    let y2 = parseInt(e.target.getAttributeNS(null, "y2"))
-
-    let weight_txt = document.createElementNS(ns, "text")
-    weight_txt.setAttributeNS(null, "x", ((x1 + x2) / 2) + 5)
-    weight_txt.setAttributeNS(null, "y", (y1 + y2) / 2)
-    weight_txt.setAttributeNS(null, "font-size", 16)
-    weight_txt.setAttributeNS(null, "font-size", 16)
-    weight_txt.setAttributeNS(null, "font-weight", "bold")
 
 
-    weight_txt.innerHTML = prompt
+let start = false
 
-    //adds weight to adjancy matrix 
-    for (let index = 0; index < graph.nodes.length; index++) {
-        for (const [key, value] of graph.nodes[index].neighbors) {
-            if (value == e.target) {
-                key.addWeight(graph.nodes[index], parseInt(prompt))
-                graph.nodes[index].addWeight(key, parseInt(prompt))
+let bfs = document.getElementById("bfs")
+bfs.classList.add("btn")
+bfs.innerHTML = "Traverse BFS"
+bfs.style.marginLeft = "25px"
+bfs.addEventListener("click", bfs_alg)
+
+let current_ind = 1
+let queue = []
+let added = []
+
+function bfs_alg() {
+
+    //removing relevant eventListeners
+    if (graph.nodes.length > 0) {
+        SVG.removeEventListener("click", createCircles)
+        more_nodes.disabled = true
+        more_nodes.style.backgroundColor = "grey"
+        more_nodes.style.textDecoration = "none"
+
+        for (let index = 0; index < lines_gp.children.length; index++) {
+            lines_gp.children[index].removeEventListener("click", line_funct)
+
+        }
+    }
+
+    let current_node = null
+
+
+    if (graph.nodes.length == 0) {
+        alert("Please add nodes and edges to get started")
+        return
+    }
+    
+    if (current_ind == queue.length) {
+        if (queue.length < graph.nodes.length) {
+            alert("Looks like one or more nodes may not have an edge. Run BFS again for another possible traversal or add more edges")
+        }
+        else {
+            alert("You've reached the end of the BFS. Refresh the page to create and visualize more graphs")
+        }
+    }
+
+    //starting node
+    if (!start) {
+        let current_ind = Math.floor(Math.random() * graph.nodes.length)
+        current_node = graph.nodes[current_ind]
+        current_node.circle_ref.setAttributeNS(null, "fill", "red")
+        start = true
+
+        queue.push([current_node.getRef(), 0, 0])
+
+
+        //first node is processed 
+        for (const [key, value] of current_node.neighbors.entries()) {
+            queue.push([key.getRef(), key, value])
+
+        }
+
+        return
+    }
+
+    current_node = queue[current_ind]
+    current_node[0].setAttributeNS(null, "fill", "red")
+    current_node[2].setAttributeNS(null, "stroke", "red")
+    // //process current node
+    current_ind++
+
+
+    for (const [key, value] of current_node[1].neighbors.entries()) {
+        let ignore = false
+        for (let index = 0; index < queue.length; index++) {
+            if (queue[index][0] == key.getRef()) {
+                ignore = true
             }
+        }
+
+        if (!ignore) {
+            queue.push([key.getRef(), key, value])
         }
 
     }
 
-    SVG.appendChild(weight_txt)
-
 }
-
-//button that listens for when users want to input edge weights 
-function strt_add_weights(e) {
-
-    let lines = document.querySelectorAll("line")
-    console.log(lines)
-    SVG.removeEventListener("click", createCircles)
-
-    for (let index = 0; index < lines.length; index++) {
-        lines[index].removeEventListener("click", line_funct)
-        lines[index].addEventListener("click", line_selected)
-
-    }
-
-}
-
-function solve() {
-
-}
-
-//assigns id to nodes and prints adj matrix
 
 let need_update = false
 let html_bd = document.querySelector("body")
@@ -331,15 +330,13 @@ function print_adj_list() {
 
     }
 
-
+    //assigns id to nodes and prints adj matrix
     need_update = true
     for (let index = 0; index < graph.nodes.length; index++) {
         graph.nodes[index].setID(index)
-        console.log(graph.nodes[index].id)
         graph.nodes[index].circle_ref.innerHTML = index
 
     }
-
 
     let th_row = document.createElement("tr")
 
@@ -354,9 +351,7 @@ function print_adj_list() {
     th_row.appendChild(col_2)
     adj_table.appendChild(th_row)
 
-
     html_bd.appendChild(adj_table)
-
 
     for (let index = 0; index < graph.nodes.length; index++) {
         let row = document.createElement("tr")
@@ -379,6 +374,3 @@ function print_adj_list() {
     }
 
 }
-
-//!put adjancy matrix on screen
-//allow deletion through matrix
