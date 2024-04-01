@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" class="city-background">
+  <head>
+    <meta charset="utf-8">
+    <title>Traveling Saleswoman</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="traveling-saleswomen.js" defer></script>
+  </head>
+
+  <body>
+    <header>
+      <h1>BFS Visualization</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html" id="currPage">Project Info</a>
+      </nav>
+    </header>
+    <div id=root>
+      <p class="lineSpace">So, as you may know, we were initially planning to present an interactive traveling salesman visualization, but given the amount of time we had left, we decided to change our topic to something that we could do with the time we had. So, the actual purpose of this site is to try to show the user, using user input as the data for the visualization, a Breadth-first search visualization in relation to a user-inputted graph of nodes and edges.</p>
+    
+      <p class="lineSpace">Our website includes an svg box that the user is allowed to interact with by both clicking inside the box to create a graph, and pressing the buttons found below the box. Clicking inside the box allows the user to add nodes, represented by svg circles, that become part of the “nodes” array of the class that we call “Graph”. Clicking one existing node and then clicking another existing node right afterwards lets the user create an edge, represented by a svg line, between those two selected nodes. Those edges also become data in the “Graph” class as part of the “edges” array, to use in the visualization of adjacency lists. Multiple edges can be added to each node to other nodes. To remove the nodes, the user would just have to click the node three times, so that the node and its corresponding edges are removed. To remove an edge, the user would just need to click it once. There are also buttons underneath the svg box that account for extra functionality, such as the “Add more nodes” button. This button allows for the user to add more nodes in case they started to add edges, but might have wanted to add more nodes.</p>
+
+      <p class="lineSpace">We also added a button called “Show Adjacency List”. Clicking this button after adding all the nodes and edges the user wants shows each existing node and their neighbors. On the left side of the table, each individual node shown in the SVG box is listed, and on the right of each of them, their neighbors are shown based on what nodes the current node’s edges are connected to.</p>
+      
+      <p class="lineSpace">For the main algorithmic component, we created a function to perform the breadth-first search algorithm on the user input data. Clicking the “Show BFS” button does this.</p>
+      
+      <p class="lineSpace">We definitely had some problems trying to get our site to work, and there was more we would have liked to get done. A problem that we ran into was making sure that the adjacency list properly displayed the nodes. We had a case where a node was being read twice because connecting that existing node with another existing node, and the way we wrote our code made it seem like there was a new node being added, but we got that fixed.  Getting our breadth-first search to work properly was also a bit difficult, and as you can probably tell, we did not get to fix it in time. But working through it, this project allowed us to learn build from the ground up, and it was an interesting experience.</p>
+
+      <h2>Image Source</h2>
+      <p>RadiasaTutorial Rti. “View of Buildings and City Street.” Vecteezy, Eezy Inc., <a href="https://www.vecteezy.com/vector-art/4578715-view-of-buildings-and-city-street">https://www.vecteezy.com/vector-art/4578715-view-of-buildings-and-city-street</a>.</p>
+    </div>
+  </body>
+</html>

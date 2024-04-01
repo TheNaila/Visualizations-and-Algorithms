@@ -1,0 +1,68 @@
+function line_selected(e) {
+
+    let prompt = window.prompt("Enter a value for the selected edge")
+
+    let rect = SVG.getBoundingClientRect();
+
+    let x1 = parseInt(e.target.getAttributeNS(null, "x1"))
+
+    let y1 = parseInt(e.target.getAttributeNS(null, "y1"))
+
+    let x2 = parseInt(e.target.getAttributeNS(null, "x2"))
+
+//allows users to input weight for an edge when edge is clicked
+
+let y2 = parseInt(e.target.getAttributeNS(null, "y2"))
+
+    let weight_txt = document.createElementNS(ns, "text")
+    weight_txt.setAttributeNS(null, "x", ((x1 + x2) / 2) + 5)
+    weight_txt.setAttributeNS(null, "y", (y1 + y2) / 2)
+    weight_txt.setAttributeNS(null, "font-size", 16)
+    weight_txt.setAttributeNS(null, "font-size", 16)
+    weight_txt.setAttributeNS(null, "font-weight", "bold")
+
+
+    weight_txt.innerHTML = prompt
+
+    //adds weight to adjancy matrix 
+    for (let index = 0; index < graph.nodes.length; index++) {
+        for (const [key, value] of graph.nodes[index].neighbors) {
+            if (value == e.target) {
+                key.addWeight(graph.nodes[index], parseInt(prompt))
+                graph.nodes[index].addWeight(key, parseInt(prompt))
+            }
+        }
+
+    }
+
+    SVG.appendChild(weight_txt)
+
+}
+
+
+//button that listens for when users want to input edge weights 
+function strt_add_weights(e) {
+
+    let lines = document.querySelectorAll("line")
+
+    SVG.removeEventListener("click", createCircles)
+
+    for (let index = 0; index < lines.length; index++) {
+        lines[index].removeEventListener("click", line_funct)
+        lines[index].addEventListener("click", line_selected)
+
+    }
+
+}
+
+
+//allow users to start adding weights 
+const add_weights = document.getElementById("add_weights")
+add_weights.innerHTML = "Add Weights"
+add_weights.addEventListener("click", strt_add_weights)
+add_weights.classList.add("btn")
+///////////////////////////////////////
+
+  addWeight = function (node, num) {
+        this.line_weights.set(node, num)
+    }

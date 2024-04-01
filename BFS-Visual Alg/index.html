@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" class="city-background">
+  <head>
+    <meta charset="utf-8">
+    <title>Traveling Saleswoman</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="traveling-saleswomen.js" defer></script>
+  </head>
+
+  <body>
+    <header>
+      <h1>BFS Visualization</h1>
+      <nav>
+        <a href="index.html" id="currPage">Home</a>
+        <a href="about.html">Project Info</a>
+      </nav>
+    </header>
+    <div id=root>
+      <p>Welcome to our Breadth-First Search Visualization! To get started, follow the steps below:</p>
+      <ol>
+        <li>To start, add some nodes by clicking inside the svg box below. If you'd like to remove a node that you created, click the existing node 3 times.</li>
+        <li>To add edges inbetween the nodes, first click on an existing node once to turn it pink, and then click on the other existing node you would like to connect it to once.</li>
+        <li>Step 2 turns off the function that allows you to add nodes. If you would like to add more nodes, click the "Add More Nodes" button and repeat step 1 and 2.</li>
+        <li>After you're done adding in your nodes and edges, you can do two things. Either (in any order): </li>
+      </ol>
+          <ul>
+            <li>click the "Show Adjacency List" button to show a table of the nodes you input and their neighbors through each edge connected, or</li>
+            <li>click the "Traverse BFS" multiple times to step through the breadth-first search visualization of your graph.</li>
+          </ul>      
+      <svg id="dot-box" xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+	      <rect width="100%" height="100%" fill="green"></rect>
+        <g id = "lines_gp"></g>
+        <g id = "circles_gp"></g>
+      </svg>
+      <button id = "more_nodes"></button>
+      <button id = "show_adj_list"></button>
+      <button id = "bfs"></button>
+    </div>
+
+  </body>
+</html>

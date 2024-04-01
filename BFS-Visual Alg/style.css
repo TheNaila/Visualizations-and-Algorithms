@@ -1,0 +1,105 @@
+/* https://www.vecteezy.com/vector-art/4578715-view-of-buildings-and-city-street */
+.city-background {
+    background-image: url("city-background.jpg");
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-attachment: fixed;
+}
+
+body {
+	max-width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0px;
+	padding-left: 100px;
+	padding-right: 100px;
+	padding-top: 20px;
+	padding-bottom: 100px;
+	background-color: rgb(208, 232, 239);
+}
+
+h1 {
+	font-size: 48px;
+	font-family: Geneva, Tahoma, sans-serif;
+	text-align: center;
+}
+
+h2 {
+	font-family: Geneva, Tahoma, sans-serif;
+}
+
+header {
+    padding-bottom: 25px;
+    /* background-color: rgb(252, 247, 222); */
+}
+
+nav {
+	display: flex;
+}
+
+nav a {
+	margin-left: auto;
+	margin-right: auto;
+	border: 3px solid black;
+	border-radius: 25px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 43px;
+	padding-right: 43px;
+	font-family: "Century Gothic";
+	color: white;
+	text-decoration: none;
+	background-color: rgb(23, 176, 12);
+
+}
+
+a#currPage {
+	font-weight: bold;
+	color: blue;
+    background-color: rgb(255, 148, 114);
+}
+
+a:hover {
+	text-decoration: underline;
+	transition: 0.3s;
+	background-color: rgb(255, 148, 114);
+}
+
+p {
+	font-family: Arial;
+}
+
+li {
+	line-height: 125%;
+	font-family: Arial;
+
+}
+
+svg {
+	display: block; /* svg elements are inline by default */
+    margin: 10px auto;    
+    border: 5px black solid;
+}
+
+.btn {
+	border-radius: 25px;
+	color: white;
+	font-family: "Century Gothic";
+	background-color: rgb(23, 176, 12);
+}
+	
+.btn:hover {
+	text-decoration: underline;
+	transition: 0.3s;
+	background-color: rgb(255, 148, 114);
+}
+	
+.btn:active{
+	font-weight: bold;
+	color: blue;
+	background-color: rgb(255, 148, 114);
+}
+
+p.lineSpace {
+	line-height: 150%;
+}
